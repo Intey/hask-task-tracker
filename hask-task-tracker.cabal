@@ -1,0 +1,123 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: aac4a57bb450d9e4c7200cefa09420d6c1c45c4fa00095952dc9409a784ad875
+
+name:           hask-task-tracker
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/hask-task-tracker#readme>
+homepage:       https://github.com/githubuser/hask-task-tracker#readme
+bug-reports:    https://github.com/githubuser/hask-task-tracker/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2021 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/hask-task-tracker
+
+library
+  exposed-modules:
+      Lib
+      Logger
+      Models
+      Storage
+      Types
+  other-modules:
+      Paths_hask_task_tracker
+  hs-source-dirs:
+      src
+  build-depends:
+      aeson
+    , ansi-terminal
+    , base
+    , bson
+    , bson-generic
+    , bytestring
+    , data-default
+    , fast-logger
+    , hslogger
+    , monad-logger
+    , mongoDB
+    , mtl
+    , network
+    , optparse-applicative
+    , servant-server
+    , stm
+    , text
+    , time
+    , wai
+    , warp
+  default-language: Haskell2010
+
+executable hask-task-tracker-exe
+  main-is: Main.hs
+  other-modules:
+      Options
+      Paths_hask_task_tracker
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , ansi-terminal
+    , base
+    , bson
+    , bson-generic
+    , bytestring
+    , data-default
+    , fast-logger
+    , hask-task-tracker
+    , hslogger
+    , monad-logger
+    , mongoDB
+    , mtl
+    , network
+    , optparse-applicative
+    , servant-server
+    , stm
+    , text
+    , time
+    , wai
+    , warp
+  default-language: Haskell2010
+
+test-suite hask-task-tracker-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_hask_task_tracker
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , ansi-terminal
+    , base
+    , bson
+    , bson-generic
+    , bytestring
+    , data-default
+    , fast-logger
+    , hask-task-tracker
+    , hslogger
+    , monad-logger
+    , mongoDB
+    , mtl
+    , network
+    , optparse-applicative
+    , servant-server
+    , stm
+    , text
+    , time
+    , wai
+    , warp
+  default-language: Haskell2010
