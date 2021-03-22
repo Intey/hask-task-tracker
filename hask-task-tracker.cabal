@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: aac4a57bb450d9e4c7200cefa09420d6c1c45c4fa00095952dc9409a784ad875
+-- hash: 680e937c79cf64b7d4827f9d886bca7b6b81f471d32df0ea6631d44764ffdf43
 
 name:           hask-task-tracker
 version:        0.1.0.0
@@ -26,9 +26,9 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
       Logger
       Models
+      Server
       Storage
       Types
   other-modules:

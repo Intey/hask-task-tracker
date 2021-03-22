@@ -1,5 +1,5 @@
 module Main where
 
-import Storage as Stor
+import Server
 
-main = Stor.check
+main = startApp

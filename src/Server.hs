@@ -1,7 +1,7 @@
 {-# LANGUAGE TypeOperators   #-}
 {-# LANGUAGE DataKinds       #-}
 
-module Lib
+module Server
     ( startApp
     ) where
 
@@ -25,12 +25,15 @@ comp = "LoggingExample.Main"
 
 type TasksAPI = ("tasks" :> Get '[JSON] [Task])
 type UsersAPI = ("users" :> Get '[JSON] [User])
-type API = "api" :> (TasksAPI :<|> UsersAPI)
+type AddUserAPI = ("users" :> ReqBody '[JSON] User :> Post '[JSON] ())
+
+type API = "api" :> (TasksAPI :<|> UsersAPI :<|> AddUserAPI)
 
 type AppM = ReaderT State Handler
 
 instance ToJSON Task
 instance ToJSON User
+instance FromJSON User
 
 data State = State {
   users :: TVar [User],
@@ -50,8 +53,13 @@ tasksHander = do
   State{tasks=p} <- ask 
   liftIO $ readTVarIO p
 
+addUserHandler :: User -> AppM ()
+addUserHandler usr = do
+  State{users=p} <- ask
+  liftIO . atomically $ modifyTVar p (usr:)
+  
 server :: ServerT API AppM
-server = tasksHander :<|> usersHandler 
+server = tasksHander :<|> usersHandler :<|> addUserHandler
 
 nt :: State -> AppM a -> Handler a
 nt s x = runReaderT x s
