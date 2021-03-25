@@ -1,15 +1,24 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExtendedDefaultRules #-}
 module Storage
+(
+    allTasks,
+    clearTasks,
+    insertTask,
+    userTasks,
+    sprintTasks,
+    allUsers,
+    insertUser
+)
 where
 
 import Database.MongoDB    (Action, Document, Document, Value, access,
                             close, connect, delete, exclude, find,
                             host, insertMany, master, project, rest,
-                            select, sort, (=:), Database)
+                            select, sort, (=:), Database, insert, insert_)
 import Control.Monad.Trans (liftIO)
 import Control.Monad ( liftM )
-import Models (Task, User)
+import Models
 import Data.Bson.Generic
 
 
@@ -33,7 +42,7 @@ check = do
 run :: Action IO ()
 run = do
     clearTasks
-    insertTasks []
+    insertTask $ Task {summary="some", description="descr", assignee=Nothing, reporter=Nothing}
     allTasks >>= printTasks "All tasks"
     userTasks "intey" >>= printTasks "My Tasks"
     sprintTasks  "some" >>= printTasks "Sprint tasks"
@@ -41,15 +50,11 @@ run = do
 clearTasks :: Action IO ()
 clearTasks = delete (select [] "tasks")
 
-insertTasks :: [Task] -> Action IO [Value]
-insertTasks = insertMany "tasks" . map toBSON
+insertTask :: Task -> Action IO Value
+insertTask = insert "tasks" . toBSON
 
 allTasks :: Action IO [Task]
 allTasks = toTasks $ rest =<< find (select [] "tasks") -- {sort = ["home.city" =: 1]}
-
-toTasks :: Action IO [Document] -> Action IO [Task]
-toTasks = fmap (filterNothing . map fromBSON)
-            where filterNothing tsks = [x | Just x <- tsks]
 
 userTasks :: String -> Action IO [Task]
 userTasks username = toTasks $ rest =<< find (select ["assignee" =: "National"] "tasks")
@@ -60,3 +65,17 @@ sprintTasks sprintname = toTasks $ rest =<< find (select ["sprint" =: sprintname
 printTasks :: String -> [Task] -> Action IO ()
 printTasks title tasks = liftIO $ putStrLn title >> mapM_ print tasks
 
+allUsers :: Action IO [User]
+allUsers = toUser $ rest =<< find (select [] "users")
+
+insertUser :: User -> Action IO ()
+insertUser = insert_ "users" . toBSON
+
+toTasks :: Action IO [Document] -> Action IO [Task]
+toTasks = fmap (filterNothing . map fromBSON)
+                
+toUser :: Action IO [Document] -> Action IO [User]
+toUser = fmap (filterNothing . map fromBSON)
+
+filterNothing :: [Maybe a] -> [a]
+filterNothing tsks = [x | Just x <- tsks]

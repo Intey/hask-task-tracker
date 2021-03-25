@@ -1,9 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module Models
-  ( Task(..),
-    User(..),
-  )
 where
 
 import GHC.Generics (Generic)
