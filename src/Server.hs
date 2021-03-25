@@ -1,26 +1,23 @@
-{-# LANGUAGE TypeOperators   #-}
-{-# LANGUAGE DataKinds       #-}
+{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators     #-}
 
 module Server
-    ( startApp
+    ( app
     ) where
 
-import Data.Aeson
-import Network.Wai
-import Network.Wai.Handler.Warp
-import Servant
-import System.Log.Logger
-import Control.Applicative ((<$>), (<*>), liftA2, Applicative)
-import Models
-import Control.Monad.Reader
+import           Data.Aeson
+import           Network.Wai
+
+import           Servant
+
+import           Common
+import           Control.Applicative  (Applicative, liftA2, (<$>), (<*>))
+import           Control.Monad.Reader
+import           Database.MongoDB
+import           Models
 import qualified Storage
-import Database.MongoDB
-import Types ( AppM )
-import Common
-
-comp = "LoggingExample.Main"
-
+import           Types                (AppM, AppEnv)
 
 type TasksAPI = ("tasks" :> Get '[JSON] [Task])
 type UsersAPI = ("users" :> Get '[JSON] [User])
@@ -44,21 +41,15 @@ tasksHander = runDb Storage.allTasks
 
 addUserHandler :: User -> AppM ()
 addUserHandler = runDb . Storage.insertUser
-  
+
 server :: ServerT API AppM
 server = tasksHander :<|> usersHandler :<|> addUserHandler
 
-nt :: String -> AppM a -> Handler a
+nt :: AppEnv -> AppM a -> Handler a
 nt s x = liftIO $ runReaderT x s
 
-app :: String -> Application
+app :: AppEnv -> Application
 app s = serve api $ hoistServer api (nt s) server
 
-startApp :: IO ()
-startApp = do
-  updateGlobalLogger comp (setLevel NOTICE)
-  let port = 1234
-  noticeM comp $ "start server on port " ++ show port
-  run port (app "")
 -- https://github.com/mauriciofierrom/servant-mongodb/blob/master/src/Common/Types.hs
 

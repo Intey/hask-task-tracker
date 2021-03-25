@@ -29,24 +29,6 @@ instance ToBSON Task
 instance FromBSON Task
 
 
-databasename :: Database
-databasename = "tracker"
-
-check :: IO ()
-check = do
-    pipe <- connect (host "127.0.0.1")
-    e <- access pipe master databasename run
-    close pipe
-    print e
-
-run :: Action IO ()
-run = do
-    clearTasks
-    insertTask $ Task {summary="some", description="descr", assignee=Nothing, reporter=Nothing}
-    allTasks >>= printTasks "All tasks"
-    userTasks "intey" >>= printTasks "My Tasks"
-    sprintTasks  "some" >>= printTasks "Sprint tasks"
-
 clearTasks :: Action IO ()
 clearTasks = delete (select [] "tasks")
 

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d567779b46ce88d4700058cc8fd1df2a5fe114c11a3e208f5bef913a60df8484
+-- hash: a02493bd27163df5ce9a34339f3f07c8ee8eca93e7c8ed5f8adcd686bf058140
 
 name:           hask-task-tracker
 version:        0.1.0.0
@@ -27,7 +27,6 @@ source-repository head
 library
   exposed-modules:
       Common
-      Logger
       Models
       Server
       Storage
@@ -87,6 +86,7 @@ executable hask-task-tracker-exe
     , stm
     , text
     , time
+    , utf8-string
     , wai
     , warp
   default-language: Haskell2010

@@ -57,6 +57,7 @@ executables:
     dependencies:
     - base
     - hask-task-tracker
+    - utf8-string
 
 tests:
   hask-task-tracker-test:
