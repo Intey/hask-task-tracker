@@ -10,9 +10,11 @@ import           Data.Aeson
 import           Database.MongoDB
 
 import           Types
+import Control.Exception.Base
 
 databasename :: Database
 databasename = "tracker"
+
 
 runDb :: Action IO a -> AppM a
 runDb action = do
@@ -20,10 +22,9 @@ runDb action = do
   pipe <- liftIO $ connect (host (dbHostname dbConf))
   -- Have to check if it isn't authorized
   -- _ <- lift . lift $ access pipe master (dbName dbConf) $ auth (dbUser dbConf) (dbPassword dbConf)
-  result <- lift $ access pipe master (dbName dbConf) action
+  result <- liftIO $ access pipe master (dbName dbConf) action
   liftIO $ close pipe
   return result
-
 
 instance FromJSON DbConfig where
   parseJSON = withObject "dbConf" $ \o -> do

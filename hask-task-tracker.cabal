@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a02493bd27163df5ce9a34339f3f07c8ee8eca93e7c8ed5f8adcd686bf058140
+-- hash: 42fbda9ad6370c52181ff95eac3ac13118888d77d96662b9f46e4f8f9179378a
 
 name:           hask-task-tracker
 version:        0.1.0.0
@@ -26,9 +26,13 @@ source-repository head
 
 library
   exposed-modules:
+      Authentica
       Common
       Models
-      Server
+      Permission
+      Server.App
+      Server.Handlers
+      Server.Types
       Storage
       Types
   other-modules:
@@ -50,6 +54,8 @@ library
     , mtl
     , network
     , optparse-applicative
+    , servant-auth
+    , servant-auth-server
     , servant-server
     , stm
     , text
@@ -61,7 +67,6 @@ library
 executable hask-task-tracker-exe
   main-is: Main.hs
   other-modules:
-      Options
       Paths_hask_task_tracker
   hs-source-dirs:
       app
@@ -82,6 +87,8 @@ executable hask-task-tracker-exe
     , mtl
     , network
     , optparse-applicative
+    , servant-auth
+    , servant-auth-server
     , servant-server
     , stm
     , text
@@ -115,6 +122,8 @@ test-suite hask-task-tracker-test
     , mtl
     , network
     , optparse-applicative
+    , servant-auth
+    , servant-auth-server
     , servant-server
     , stm
     , text

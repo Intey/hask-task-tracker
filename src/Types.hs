@@ -5,8 +5,7 @@ module Types where
 import           Control.Monad.Reader (ReaderT)
 import           Data.Text            (Text)
 import           Servant
-
-type AppM = ReaderT AppEnv IO
+type AppM = ReaderT AppEnv Handler
 
 data DbConfig =
   DbConfig { dbHostname :: String
@@ -18,5 +17,3 @@ data AppEnv =
   AppEnv { dbConfig :: DbConfig
          , logPath  :: String }
 
-
-type App = ReaderT AppEnv Handler

@@ -39,6 +39,8 @@ dependencies:
 - ansi-terminal
 - fast-logger
 - stm
+- servant-auth
+- servant-auth-server
   # - template-haskell
   # - persistent
   # - persistent-mongoDB
