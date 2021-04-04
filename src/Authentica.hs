@@ -9,7 +9,7 @@ import           Data.Bson.Generic
 import qualified Data.ByteString.Char8 as BS
 import           Database.MongoDB      as Mongo
 import           GHC.Generics          (Generic)
-import           Models
+import           Domain.Models
 import           Servant
 import           Servant.Auth          as SA
 import           Servant.Auth.Server   as SAS
@@ -20,7 +20,7 @@ data AuthUser = AUser { id     :: String
 } deriving (Show, Generic)
 
 authUserFromUser :: Maybe User -> Maybe AuthUser
-authUserFromUser (Just (User username _)) = Just $ AUser username ""
+authUserFromUser (Just (User username _ _)) = Just $ AUser username ""
 authUserFromUser Nothing = Nothing 
 
 instance ToJSON AuthUser

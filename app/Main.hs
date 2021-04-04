@@ -8,7 +8,7 @@ import           Data.ByteString.Lazy.UTF8 (toString)
 import           Network.Wai.Handler.Warp  (run)
 import           Servant
 import           Servant.Auth.Server       as SAS
-import           Server.App                (mkApp)
+import           Server.App                (mkDevApp)
 import           System.Log.Logger         (Priority (NOTICE), noticeM,
                                             setLevel, updateGlobalLogger)
 import           Types
@@ -32,4 +32,5 @@ main = do
       cfg = cookieCfg :. jwtCfg :. EmptyContext
   case appEnv of
     Nothing  -> error "Configuration could not be loaded"
-    Just env -> run port (mkApp cfg cookieCfg jwtCfg env)
+    Just env -> run port (mkDevApp env) -- (mkApp cfg cookieCfg jwtCfg env)
+  

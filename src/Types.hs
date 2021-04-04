@@ -16,4 +16,3 @@ data DbConfig =
 data AppEnv =
   AppEnv { dbConfig :: DbConfig
          , logPath  :: String }
-

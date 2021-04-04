@@ -1,28 +1,22 @@
 {-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE ScopedTypeVariables  #-}
+
 module Storage
-(
-    allTasks,
-    clearTasks,
-    insertTask,
-    userTasks,
-    sprintTasks,
-    allUsers,
-    insertUser,
-    loginCollection,
-    toUser,
-    loadUser
-)
 where
 
 import           Control.Monad       (liftM)
 import           Control.Monad.Trans (liftIO)
 import           Data.Bson.Generic
-import           Database.MongoDB hiding (allUsers)
-import           Models
+import           Database.MongoDB    (Action, Collection, Document,
+                                      Select (select), find, findOne, insert_,
+                                      rest, (=:))
+import qualified Domain.Interfaces   as DI
+import           Domain.Models       (Issue, Key(Key), Project (Project), User)
 
-tasksCollection :: Collection
-tasksCollection = "tasks"
+projectsCollection :: Collection
+projectsCollection = "projects"
 
 usersCollection :: Collection
 usersCollection = "users"
@@ -30,49 +24,72 @@ usersCollection = "users"
 loginCollection :: Collection
 loginCollection = "logins"
 
+
+instance ToBSON (Key User)
+instance FromBSON (Key User)
 instance ToBSON User
 instance FromBSON User
 
-instance ToBSON Task
-instance FromBSON Task
+instance ToBSON (Key Issue)
+instance FromBSON (Key Issue)
+instance ToBSON Issue
+instance FromBSON Issue
+
+instance ToBSON (Key Project)
+instance FromBSON (Key Project)
+instance ToBSON Project
+instance FromBSON Project
 
 
-clearTasks :: Action IO ()
-clearTasks = delete (select [] tasksCollection)
+saveProject :: Project -> Action IO ()
+saveProject = insert_ projectsCollection . toBSON
 
-insertTask :: Task -> Action IO Value
-insertTask = insert tasksCollection . toBSON
 
-allTasks :: Action IO [Task]
-allTasks = toTasks $ rest =<< find (select [] tasksCollection) -- {sort = ["home.city" =: 1]}
+loadProject :: Key Project -> Action IO (Maybe Project)
+loadProject (Key k) = do
+    doc <- findOne (select ["key" =: k] projectsCollection)
+    return (doc >>= fromBSON)
 
-userTasks :: String -> Action IO [Task]
-userTasks username = toTasks $ rest =<< find (select ["assignee" =: "National"] tasksCollection)
 
-sprintTasks :: String -> Action IO [Task]
-sprintTasks sprintname = toTasks $ rest =<< find (select ["sprint" =: sprintname] tasksCollection)
+projectIssues :: Key Project  -> Action IO [Issue]
+projectIssues (Key k) = do
+    proj <- findOne (select ["key" =: k] projectsCollection)
+    case parseProjectIssues proj of
+        Just is -> pure is
+        Nothing -> pure []
+
+
+toIssue :: Action IO [Document] -> Action IO [Issue]
+toIssue = fmap (filterNothing . map fromBSON)
+
+
+toUser :: Action IO [Document] -> Action IO [User]
+toUser = fmap (filterNothing . map fromBSON)
+
 
 allUsers :: Action IO [User]
 allUsers = toUser $ rest =<< find (select [] usersCollection)
 
+
+{- | Saves new user
+TODO: Should accepts Input-Bound Struct "NewUser" and return User key
+-}
 insertUser :: User -> Action IO ()
 insertUser = insert_ usersCollection . toBSON
 
 
 loadUser :: String -> Action IO (Maybe User)
 loadUser login = do
-    res <- findOne (select ["username" =: login] "users")
+    res <- findOne (select ["username" =: login] usersCollection)
     pure $ res >>= fromBSON
 
 
-toTasks :: Action IO [Document] -> Action IO [Task]
-toTasks = fmap (filterNothing . map fromBSON)
+parseProjectIssues :: Maybe Document -> Maybe [Issue]
+parseProjectIssues doc = do
+    d <- doc
+    (Project _ _ _ _ issues) <- fromBSON d
+    return issues
 
-toUser :: Action IO [Document] -> Action IO [User]
-toUser = fmap (filterNothing . map fromBSON)
 
 filterNothing :: [Maybe a] -> [a]
 filterNothing tsks = [x | Just x <- tsks]
-
-printTasks :: String -> [Task] -> Action IO ()
-printTasks title tasks = liftIO $ putStrLn title >> mapM_ print tasks

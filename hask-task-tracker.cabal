@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 42fbda9ad6370c52181ff95eac3ac13118888d77d96662b9f46e4f8f9179378a
+-- hash: b7e5bd0bb38ed80cf3fe946b0798284b2d89f38231ae64dbd7c802ac19b17e9a
 
 name:           hask-task-tracker
 version:        0.1.0.0
@@ -28,10 +28,14 @@ library
   exposed-modules:
       Authentica
       Common
-      Models
+      Domain.Function
+      Domain.InputBounds
+      Domain.Interfaces
+      Domain.Models
       Permission
       Server.App
       Server.Handlers
+      Server.Handlers.Project
       Server.Types
       Storage
       Types
@@ -70,7 +74,7 @@ executable hask-task-tracker-exe
       Paths_hask_task_tracker
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -haddock
   build-depends:
       aeson
     , ansi-terminal
@@ -105,7 +109,7 @@ test-suite hask-task-tracker-test
       Paths_hask_task_tracker
   hs-source-dirs:
       test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -haddock
   build-depends:
       aeson
     , ansi-terminal

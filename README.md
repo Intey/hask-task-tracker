@@ -1,10 +1,12 @@
 # hask-task-tracker
 
-# How diener works
+Simple Task Tracker
 
-- declare api with servant
-- declare typeclasses in MongoDB.Class for simplify `insert` `getAll`
-  (de)serialize from/to mongo
+Features:
 
-`ReadOnly` - Monad that instantiate this class, can call `getAll` and gets content from mongo
+- As in Jira
 
+- View projects
+- View project backlog/board (issues with custom fields on screen)
+- CRUD sprints in project
+- CRUD Issue details
