@@ -40,9 +40,12 @@ instance FromBSON (Key Project)
 instance ToBSON Project
 instance FromBSON Project
 
-
+{-| saveProject updates exist project -}
 saveProject :: Project -> Action IO ()
 saveProject = insert_ projectsCollection . toBSON
+
+createProject :: Project -> Action IO (Key Project)
+createProject = undefined 
 
 
 loadProject :: Key Project -> Action IO (Maybe Project)

@@ -8,27 +8,18 @@ module Server.App
     mkDevApp
     ) where
 
-import           Data.Aeson
 import           Network.Wai
 
 import           Servant
 
-import           Authentica
-import           Common
 import           Control.Applicative  (Applicative, liftA2, (<$>), (<*>))
 import           Control.Monad        (ap)
 import           Control.Monad.Reader
-import           Data.Text
-import           Database.MongoDB
-import           GHC.Generics
-import           Domain.Models
 import           Servant.Auth         as SA
-import           Servant.Auth.Server  as SAS
-import           Server.Handlers
-import           Server.Types
 import qualified Storage
 import           Types                (AppEnv, AppM)
 
+import Server.Api ( DevAPI, FullAPI, devHandlers )
 -- server :: SAS.CookieSettings -> SAS.JWTSettings -> ServerT (FullAPI auths) AppM
 -- server cs jwts = protected :<|> unprotected cs jwts
 

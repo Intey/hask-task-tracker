@@ -20,54 +20,15 @@ import qualified Domain.Interfaces    as DI
 import qualified Storage
 import           Types
 
-instance ToJSON (Key User)
-instance FromJSON (Key User)
-instance ToJSON (Key Project)
-instance FromJSON (Key Project)
-instance ToJSON (Key Issue)
-instance FromJSON (Key Issue)
-instance ToJSON Issue
-instance FromJSON Issue
-instance ToJSON User
-instance FromJSON User
-instance ToJWT User
-instance FromJWT User
-instance ToJSON Project 
-instance FromJSON Project 
-instance ToJSON IssueField 
-instance FromJSON IssueField
-instance ToJSON IssueViewConfig 
-instance FromJSON IssueViewConfig 
-instance ToJSON BackLog 
-instance FromJSON BackLog 
-
-instance DI.IssuesStorage AppM where
-    loadIssues k = runDb $ Storage.projectIssues k
-    saveIssue = undefined 
-
-instance DI.ProjectStorage AppM where
-    loadProject = runDb . Storage.loadProject 
-    saveProject = undefined 
-    loadIssueViewConfig = undefined
 
 usersHandler :: AppM [User]
 usersHandler = do
 --   ctx <- ask
   runDb Storage.allUsers
 
-projectIssuesHandler :: String -> AppM [Issue]
-projectIssuesHandler = DI.loadIssues . Key
 
 addUserHandler :: User -> AppM ()
 addUserHandler = runDb . Storage.insertUser
-
-
-getBacklogScreen :: String -> AppM BackLog
-getBacklogScreen = DF.getBacklogScreen . Key
-
-projectDetailsHandler :: String -> AppM Project
-projectDetailsHandler = undefined 
-
 
 loginHandler :: CookieSettings
              -> JWTSettings
@@ -102,10 +63,3 @@ registerHandler cookieSettings jwtSettings (RegisterForm username pass) = do
 -- protected (Authenticated usr) = tasksHander :<|> addUserHandler :<|> usersHandler
 -- protected _ = throwAll err403
 
-
-unprotected :: SAS.CookieSettings -> SAS.JWTSettings -> ServerT LoginApi AppM
-unprotected cs jwts = loginHandler cs jwts :<|> registerHandler cs jwts
-
-
-devHandlers :: ServerT DevAPI AppM
-devHandlers = (\x -> projectDetailsHandler x :<|> getBacklogScreen x) :<|> addUserHandler :<|> usersHandler

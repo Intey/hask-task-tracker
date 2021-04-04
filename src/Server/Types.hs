@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Server.Types where
 
@@ -14,6 +15,11 @@ import           Servant.Auth.Server as SAS
 
 import           Authentica
 import           Domain.Models
+import qualified Domain.Interfaces as DI
+import           Types
+import qualified Storage
+import           Common (runDb)
+
 
 type LogMessage = String
 
@@ -35,47 +41,20 @@ instance FromJSON LoginForm
 instance ToJSON RegisterForm
 instance FromJSON RegisterForm
 
-instance ToJSON (Key User)
-instance FromJSON (Key User)
-instance ToJSON (Key Project)
-instance FromJSON (Key Project)
-instance ToJSON (Key Issue)
-instance FromJSON (Key Issue)
-instance ToJSON Issue
-instance FromJSON Issue
-instance ToJSON User
-instance FromJSON User
-instance ToJWT User
-instance FromJWT User
-instance ToJSON Project 
-instance FromJSON Project 
-instance ToJSON IssueField 
-instance FromJSON IssueField
-instance ToJSON IssueViewConfig 
-instance FromJSON IssueViewConfig 
-instance ToJSON BackLog 
-instance FromJSON BackLog 
 
 
 instance DI.IssuesStorage AppM where
     loadIssues k = runDb $ Storage.projectIssues k
     saveIssue = undefined 
 
-
 instance DI.ProjectStorage AppM where
     loadProject = runDb . Storage.loadProject 
     saveProject = undefined 
     loadIssueViewConfig = undefined
+    loadProjectName = undefined
 
-
-type ProjectAPI =
-    "projects" :> Capture "projectKey" String 
-    :> ( Get '[JSON] Project
-    :<|> "board" 
-      :> ( Get '[JSON] BackLog 
-      :<|> "config" :> (Get '[JSON] BackLogConfig :<|> Post '[JSON] BackLogConfig )
-      )
-    )
+instance DI.SprintStorage AppM where
+    loadSprints = undefined
 
 
 type LoginApi =
@@ -92,8 +71,3 @@ type LoginApi =
 type UsersAPI = "users" :> ( ReqBody '[JSON] User :> Post '[JSON] ()
                         :<|> Get '[JSON] [User]
                         )
-
-
-type API = "api" :> (ProjectAPI  :<|> UsersAPI)
-type FullAPI auths = (Auth auths AuthUser :> API) :<|> LoginApi
-type DevAPI = API
