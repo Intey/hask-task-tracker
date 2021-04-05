@@ -21,15 +21,6 @@ import qualified Storage
 import           Types
 
 
-usersHandler :: AppM [User]
-usersHandler = do
---   ctx <- ask
-  runDb Storage.allUsers
-
-
-addUserHandler :: User -> AppM ()
-addUserHandler = runDb . Storage.insertUser
-
 loginHandler :: CookieSettings
              -> JWTSettings
              -> LoginForm

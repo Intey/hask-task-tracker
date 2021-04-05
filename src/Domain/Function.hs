@@ -3,7 +3,7 @@ module Domain.Function where
 import           Control.Monad.State
 import           Data.Char           (toUpper)
 import qualified Domain.InputBounds  as IB
-import           Domain.Interfaces as DI
+import           Domain.Interfaces   as DI
 import           Domain.Models
 
 createIssue :: (Monad m, IssuesStorage m) =>
@@ -24,6 +24,7 @@ createProject owner name descr = do
         , projectDescription = descr
         , projectOwner = owner
         , projectIssues = []
+        , projectWorkflow = Nothing
         }
 
 
@@ -32,7 +33,7 @@ getBacklogScreen :: (Monad m, IssuesStorage m, ProjectStorage m, SprintStorage m
 getBacklogScreen pk = do
     issues <- loadIssues pk
     pn <- loadProjectName pk
-    case pn of 
+    case pn of
       Just n -> do
         ivc <- loadIssueViewConfig pk -- TODO: typeclass to load backlog config?
         sprints <- loadSprints pk

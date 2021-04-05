@@ -43,7 +43,11 @@ data Project = Project
   , projectDescription :: String
   , projectOwner       :: Key User
   , projectIssues      :: [Issue]
+  , projectWorkflow    :: Maybe Workflow
   } deriving (Show, Eq, Generic, FromJSON, ToJSON)
+
+data Workflow = Workflow 
+  deriving (Show, Eq, Generic, FromJSON, ToJSON)
 
 
 data Sprint = Sprint

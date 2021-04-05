@@ -11,6 +11,7 @@ import           Servant.Auth.Server  as SAS
 import Types
 import Server.Handlers
 import Server.Handlers.Project
+import Server.Handlers.User
 
 type API = "api" :> (ProjectAPI  :<|> UsersAPI)
 type FullAPI auths = (Auth auths AuthUser :> API) :<|> LoginApi
@@ -22,4 +23,4 @@ unprotected cs jwts = loginHandler cs jwts :<|> registerHandler cs jwts
 
 
 devHandlers :: ServerT DevAPI AppM
-devHandlers = projectServer :<|> addUserHandler :<|> usersHandler
+devHandlers = projectServer :<|> usersServer

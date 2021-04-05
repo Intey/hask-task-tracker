@@ -11,10 +11,10 @@ import           Control.Monad.Trans (liftIO)
 import           Data.Bson.Generic
 import           Database.MongoDB    (Action, Collection, Document,
                                       Select (select), find, findOne, insert_,
-                                      rest, (=:))
+                                      rest, (=:), insert, cast, typed, Query (project))
 import qualified Domain.Interfaces   as DI
-import           Domain.Models       (Issue, Key(Key), Project (Project), User)
-
+import           Domain.Models       (Issue, Key(Key), Project (Project), User, Workflow)
+import Data.Functor ( (<&>) )
 projectsCollection :: Collection
 projectsCollection = "projects"
 
@@ -39,13 +39,17 @@ instance ToBSON (Key Project)
 instance FromBSON (Key Project)
 instance ToBSON Project
 instance FromBSON Project
+instance ToBSON Workflow
+instance FromBSON Workflow
+
 
 {-| saveProject updates exist project -}
 saveProject :: Project -> Action IO ()
 saveProject = insert_ projectsCollection . toBSON
 
+
 createProject :: Project -> Action IO (Key Project)
-createProject = undefined 
+createProject p = typed <$> insert projectsCollection (toBSON p)
 
 
 loadProject :: Key Project -> Action IO (Maybe Project)
@@ -61,7 +65,9 @@ projectIssues (Key k) = do
         Just is -> pure is
         Nothing -> pure []
 
+loadBacklog :: Key Project -> Action IO (Maybe String)
 
+loadBacklog (Key k) = findOne (select ["key" =: k] projectsCollection) {project = ["name" =: 1]} >>= (<&> fromBSON)
 toIssue :: Action IO [Document] -> Action IO [Issue]
 toIssue = fmap (filterNothing . map fromBSON)
 
@@ -90,7 +96,7 @@ loadUser login = do
 parseProjectIssues :: Maybe Document -> Maybe [Issue]
 parseProjectIssues doc = do
     d <- doc
-    (Project _ _ _ _ issues) <- fromBSON d
+    (Project _ _ _ _ issues _) <- fromBSON d
     return issues
 
 
