@@ -18,12 +18,15 @@ import qualified Domain.Interfaces          as DI
 import           Domain.Models              (BackLog, BackLogConfig,
                                              BackLogScreen, Issue, Key (Key),
                                              Project, User)
+import           Domain.InputBounds
 import           GHC.Generics               (Generic)
 import           Servant
 import           Server.Types
 import           Types                      (AppM)
 import qualified Storage
 import Common 
+
+type ProjectKey = String
 
 type ProjectAPI =
     "projects"
@@ -34,7 +37,7 @@ type ProjectAPI =
         :> ( Get '[JSON] BackLogScreen
         :<|> "config"
           :> ( Get '[JSON] BackLogConfig
-          :<|> Post '[JSON] BackLogConfig
+          :<|> (ReqBody '[JSON] CreateBacklogConfig :> Post '[JSON] ())
           )
         )
     )
@@ -46,7 +49,7 @@ data CreateProjectSchema = CreateProject
 } deriving (Show, Generic, FromJSON)
 
 
-getBacklogScreen :: String -> AppM BackLogScreen
+getBacklogScreen :: ProjectKey -> AppM BackLogScreen
 getBacklogScreen k = do
     s <- DF.getBacklogScreen (Key k)
     case s of
@@ -54,7 +57,7 @@ getBacklogScreen k = do
         Nothing     -> throwError err404
 
 
-projectDetailsHandler :: String -> AppM Project
+projectDetailsHandler :: ProjectKey -> AppM Project
 projectDetailsHandler k = do
     prj <- runDb $ Storage.loadProject (Key k)
     case prj of
@@ -66,11 +69,14 @@ postProject :: CreateProjectSchema -> AppM (Key Project)
 postProject (CreateProject o n d) = DF.createProject o n (fromMaybe "No description" d)
 
 
-postBacklogConfig :: String -> AppM BackLogConfig
-postBacklogConfig = undefined
+postBacklogConfig :: ProjectKey -> CreateBacklogConfig -> AppM ()
+postBacklogConfig k (CBC ivc w) = do
+  done <- runDb $ Storage.saveBacklogConfig (Key k) ivc w
+  if done then pure ()
+  else throwError err500 { errBody = "Storage update error?" }
 
 
-getBacklogConfig :: String -> AppM BackLogConfig
+getBacklogConfig :: ProjectKey -> AppM BackLogConfig
 getBacklogConfig = undefined
 
 

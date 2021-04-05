@@ -11,9 +11,10 @@ import           Control.Monad.Trans (liftIO)
 import           Data.Bson.Generic
 import           Database.MongoDB    (Action, Collection, Document,
                                       Select (select), find, findOne, insert_,
-                                      rest, (=:), insert, cast, typed, Query (project))
+                                      rest, (=:), insert, cast, typed, Query (project), look, findAndModify)
 import qualified Domain.Interfaces   as DI
 import           Domain.Models       (Issue, Key(Key), Project (Project), User, Workflow)
+import qualified Domain.Models as DM
 import Data.Functor ( (<&>) )
 projectsCollection :: Collection
 projectsCollection = "projects"
@@ -37,6 +38,10 @@ instance FromBSON Issue
 
 instance ToBSON (Key Project)
 instance FromBSON (Key Project)
+instance FromBSON DM.IssueField
+instance ToBSON DM.IssueField
+instance FromBSON DM.IssueViewConfig
+instance ToBSON DM.IssueViewConfig
 instance ToBSON Project
 instance FromBSON Project
 instance ToBSON Workflow
@@ -65,9 +70,17 @@ projectIssues (Key k) = do
         Just is -> pure is
         Nothing -> pure []
 
-loadBacklog :: Key Project -> Action IO (Maybe String)
+loadProjectName :: Key Project -> Action IO (Maybe String)
+loadProjectName (Key k) = do
+  proj <- findOne (select ["key" =: k] projectsCollection) {project = ["name" =: 1, "_id" =: 0]}
+  return $ proj >>= look "name" >>= cast
 
-loadBacklog (Key k) = findOne (select ["key" =: k] projectsCollection) {project = ["name" =: 1]} >>= (<&> fromBSON)
+saveBacklogConfig :: Key Project -> DM.IssueViewConfig -> DM.Workflow -> Action IO Bool
+saveBacklogConfig (Key k) ivc w = findAndModify 
+  (select ["key" =: k] projectsCollection) ["viewConfig" =: ivc, "workflow" =: w] 
+  <&> either (const False) (const True)
+
+
 toIssue :: Action IO [Document] -> Action IO [Issue]
 toIssue = fmap (filterNothing . map fromBSON)
 
@@ -78,7 +91,6 @@ toUser = fmap (filterNothing . map fromBSON)
 
 allUsers :: Action IO [User]
 allUsers = toUser $ rest =<< find (select [] usersCollection)
-
 
 {- | Saves new user
 TODO: Should accepts Input-Bound Struct "NewUser" and return User key
@@ -96,8 +108,8 @@ loadUser login = do
 parseProjectIssues :: Maybe Document -> Maybe [Issue]
 parseProjectIssues doc = do
     d <- doc
-    (Project _ _ _ _ issues _) <- fromBSON d
-    return issues
+    prj <- fromBSON d
+    pure $ DM.projectIssues prj
 
 
 filterNothing :: [Maybe a] -> [a]

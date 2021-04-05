@@ -19,6 +19,7 @@ import qualified Domain.Function      as DF
 import qualified Domain.Interfaces    as DI
 import qualified Storage
 import           Types
+import           Server.Handlers.Auth
 
 
 loginHandler :: CookieSettings

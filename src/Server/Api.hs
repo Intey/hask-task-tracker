@@ -12,6 +12,7 @@ import Types
 import Server.Handlers
 import Server.Handlers.Project
 import Server.Handlers.User
+import Server.Handlers.Auth
 
 type API = "api" :> (ProjectAPI  :<|> UsersAPI)
 type FullAPI auths = (Auth auths AuthUser :> API) :<|> LoginApi

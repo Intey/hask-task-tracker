@@ -15,7 +15,7 @@ instance DI.ProjectStorage AppM where
     loadProject = runDb . Storage.loadProject
     saveProject = undefined
     loadIssueViewConfig = undefined
-    loadProjectName = runDb . Storage.loadBacklog
+    loadProjectName = runDb . Storage.loadProjectName
     createProject = runDb . undefined 
 
 instance DI.SprintStorage AppM where
