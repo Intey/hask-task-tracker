@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 10cf5ae16d3841b43d4d9c0f513cd52bcfb4e67b716323629bd2ae181c07dc78
+-- hash: 106cdd806f158a2dc862b53c2c626a008cea1a11586f6978ce7bbf9a93d53e36
 
 name:           hask-task-tracker
 version:        0.1.0.0
@@ -64,7 +64,9 @@ library
     , servant-auth
     , servant-auth-server
     , servant-server
+    , servant-swagger
     , stm
+    , swagger2
     , text
     , time
     , wai
@@ -97,7 +99,9 @@ executable hask-task-tracker-exe
     , servant-auth
     , servant-auth-server
     , servant-server
+    , servant-swagger
     , stm
+    , swagger2
     , text
     , time
     , utf8-string
@@ -132,7 +136,9 @@ test-suite hask-task-tracker-test
     , servant-auth
     , servant-auth-server
     , servant-server
+    , servant-swagger
     , stm
+    , swagger2
     , text
     , time
     , wai

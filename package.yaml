@@ -41,6 +41,8 @@ dependencies:
 - stm
 - servant-auth
 - servant-auth-server
+- servant-swagger
+- swagger2
   # - template-haskell
   # - persistent
   # - persistent-mongoDB

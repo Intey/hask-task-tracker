@@ -25,6 +25,7 @@ import           Server.Types
 import           Types                      (AppM)
 import qualified Storage
 import Common 
+import Data.Swagger
 
 type ProjectKey = String
 
@@ -46,7 +47,7 @@ data CreateProjectSchema = CreateProject
     { owner       :: Key User
     , name        :: String
     , description :: Maybe String
-} deriving (Show, Generic, FromJSON)
+} deriving (Show, Generic, FromJSON, ToSchema)
 
 
 getBacklogScreen :: ProjectKey -> AppM BackLogScreen

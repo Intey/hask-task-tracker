@@ -3,6 +3,7 @@
 {-# LANGUAGE DataKinds         #-}
 
 module Server.Api where
+
 import Servant
 import Server.Types
 import Authentica
