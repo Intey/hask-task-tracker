@@ -43,6 +43,7 @@ dependencies:
 - servant-auth-server
 - servant-swagger
 - swagger2
+- lens
   # - template-haskell
   # - persistent
   # - persistent-mongoDB

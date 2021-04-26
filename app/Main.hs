@@ -15,37 +15,48 @@ import Servant.Swagger
 import Server.Api
 import Server.App (mkDevApp)
 import System.Log.Logger
+
   ( Priority (NOTICE),
     noticeM,
     setLevel,
     updateGlobalLogger,
   )
-import Types
+import qualified Types as T
+import Common ( runDb_ )
+import qualified Storage 
+
 
 comp = "LoggingExample.Main"
 
+-- TODO: configuration from file or venv
+
 main' :: IO ()
 main' = do
-  configFile <- BL.readFile "config.json"
-  updateGlobalLogger comp (setLevel NOTICE)
-  let port = 3000
-  noticeM comp $ "start server on port " ++ show port
-  (putStrLn . toString) configFile
   myKey <- generateKey
-  let appEnv = (decode configFile :: Maybe AppEnv)
+  configFile <- BL.readFile "config.json"
+  let appEnv = (decode configFile :: Maybe T.AppEnv)
       jwtCfg = defaultJWTSettings myKey
       cookieCfg =
         if True -- get from environment or config
           then defaultCookieSettings {cookieIsSecure = SAS.NotSecure}
           else defaultCookieSettings
       cfg = cookieCfg :. jwtCfg :. EmptyContext
+
+  updateGlobalLogger comp (setLevel NOTICE)
+  let port = 3000
+  noticeM comp $ "start server on port " ++ show port
+  (putStrLn . toString) configFile
   case appEnv of
     Nothing -> error "Configuration could not be loaded"
-    Just env -> run port (mkDevApp env) -- (mkApp cfg cookieCfg jwtCfg env)
+    Just env -> do
+      runDb_ Storage.initDB (T.dbConfig env)
+      run port (mkDevApp env) -- (mkApp cfg cookieCfg jwtCfg env)
 
-getSwagger :: IO ()
-getSwagger = BLC.putStrLn $ encode $ toSwagger (Proxy :: Proxy DevAPI)
+getSwagger :: String
+getSwagger =  BLC.unpack $ encode $ swaggerAPI
 
 main = do
-  getSwagger
+  let sw = getSwagger
+  writeFile "swagger.json" sw
+  putStrLn sw
   main' 

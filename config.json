@@ -3,6 +3,7 @@
       "host": "127.0.0.1",
       "database" : "tracker"
     },
-    "logPath": "-"
+    "logPath": "-",
+    "port": 3000
   }
   

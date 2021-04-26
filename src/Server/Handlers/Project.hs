@@ -10,44 +10,46 @@ module Server.Handlers.Project
 , ProjectAPI
 )
 where
+import           Common
 import           Data.Aeson                 (FromJSON)
 import qualified Data.ByteString.Lazy.Char8 as BS
 import           Data.Maybe                 (fromMaybe)
+import           Data.Swagger
 import qualified Domain.Function            as DF
+import           Domain.InputBounds.CreateProject
+import           Domain.InputBounds.CreateBacklogConfig
 import qualified Domain.Interfaces          as DI
 import           Domain.Models              (BackLog, BackLogConfig,
                                              BackLogScreen, Issue, Key (Key),
                                              Project, User)
-import           Domain.InputBounds
 import           GHC.Generics               (Generic)
 import           Servant
 import           Server.Types
-import           Types                      (AppM)
 import qualified Storage
-import Common 
-import Data.Swagger
+import           Types                      (AppM)
+import Data.Char (toUpper)
 
 type ProjectKey = String
 
 type ProjectAPI =
     "projects"
-    :> Capture "projectKey" String
-    :> ( Get '[JSON] Project
-    :<|> (ReqBody '[JSON] CreateProjectSchema :> Post '[JSON] (Key Project))
-    :<|> "board"
-        :> ( Get '[JSON] BackLogScreen
-        :<|> "config"
-          :> ( Get '[JSON] BackLogConfig
-          :<|> (ReqBody '[JSON] CreateBacklogConfig :> Post '[JSON] ())
-          )
-        )
-    )
+    :> ((ReqBody '[JSON] CreateProjectSchema :> Post '[JSON] (Key Project))
+    :<|> (
+        Capture "projectKey" String
+        :> ( Get '[JSON] Project
+            :<|> "board"
+                :> ( Get '[JSON] BackLogScreen
+                    :<|> "config"
+                    :> ( Get '[JSON] BackLogConfig
+                        :<|> (ReqBody '[JSON] CreateBacklogConfig :> Post '[JSON] ())
+                        )
+                    )
+            )
+        ))
 
-data CreateProjectSchema = CreateProject
-    { owner       :: Key User
-    , name        :: String
-    , description :: Maybe String
-} deriving (Show, Generic, FromJSON, ToSchema)
+
+postProject :: CreateProjectSchema -> AppM (Key Project)
+postProject (CreateProject o n d) = DF.createProject o n (fromMaybe "No description" d)
 
 
 getBacklogScreen :: ProjectKey -> AppM BackLogScreen
@@ -60,14 +62,10 @@ getBacklogScreen k = do
 
 projectDetailsHandler :: ProjectKey -> AppM Project
 projectDetailsHandler k = do
-    prj <- runDb $ Storage.loadProject (Key k)
+    prj <- runDb $ Storage.loadProject (Key (map toUpper k))
     case prj of
-        Just p -> pure p
-        Nothing  -> throwError err404
-
-
-postProject :: CreateProjectSchema -> AppM (Key Project)
-postProject (CreateProject o n d) = DF.createProject o n (fromMaybe "No description" d)
+        Just p  -> pure p
+        Nothing -> throwError err404
 
 
 postBacklogConfig :: ProjectKey -> CreateBacklogConfig -> AppM ()
@@ -82,8 +80,8 @@ getBacklogConfig = undefined
 
 
 projectServer :: ServerT ProjectAPI AppM
-projectServer projectKey = projectDetailsHandler projectKey
-                      :<|> postProject
+projectServer = postProject :<|> \projectKey ->
+                           projectDetailsHandler projectKey
                       :<|> getBacklogScreen projectKey
                       :<|> getBacklogConfig projectKey
                       :<|> postBacklogConfig projectKey

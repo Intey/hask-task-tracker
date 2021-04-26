@@ -9,8 +9,8 @@ import           Control.Monad.Trans
 import           Data.Aeson
 import           Database.MongoDB
 
+import           Control.Exception.Base
 import           Types
-import Control.Exception.Base
 
 databasename :: Database
 databasename = "tracker"
@@ -26,6 +26,12 @@ runDb action = do
   liftIO $ close pipe
   return result
 
+runDb_ :: Action IO a -> DbConfig -> IO ()
+runDb_ action config = do
+  pipe <- connect (host (dbHostname config))
+  result <- access pipe master (dbName config) action
+  close pipe
+
 instance FromJSON DbConfig where
   parseJSON = withObject "dbConf" $ \o -> do
     dbHostname <- o .: "host"
@@ -36,8 +42,9 @@ instance FromJSON DbConfig where
 instance FromJSON AppEnv where
   parseJSON = withObject "config" $ \o -> do
     logPath    <- o      .: "logPath"
+    configEnvPort <- o   .: "port"
     dbConf     <- o      .: "dbConfig"
     dbHostname <- dbConf .: "host"
     dbName     <- dbConf .: "database"
     let dbConfig = DbConfig {..}
-    return (AppEnv dbConfig logPath)
+    return (AppEnv dbConfig logPath configEnvPort)

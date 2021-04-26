@@ -1,16 +1,16 @@
-# hask-task-tracker
+# Task Tracker
 
-Simple Task Tracker
 
 Features (As in Jira):
-- View project list
-- View project backlog/board (issues with custom fields on screen)
-- View backlog settings
-- CRUD Issue details
-- Workflows of issues
+- [x] View project list
+- [x] View project backlog/board (issues with custom fields on screen)
+- [x] View backlog settings
+- [x] CRUD Issue details
+- [ ] Configure workflow of issues (per project/issue-type)
+- [ ] Transition issues
+- [ ] Assignee issues
+- [ ] Authentication
 
-Backlog is just list of issues grouped by sprint (or without sprint)
-Backlog contains: 
-- Sprints
-- Issues of project
-
+Extra:
+- [ ] join jira: background service (jira adapter)
+- [ ] issues/projects/workflows/etc ID from jira should be in this objects

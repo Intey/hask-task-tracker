@@ -1,0 +1,13 @@
+# Backlog
+
+Backlog is just list of issues grouped by sprint (or without sprint).
+
+Backlog contains: 
+- Sprints
+- Issues of project
+
+Issue can be assigned to Sprints. 
+By default all issues has state: InBacklog | InSprint.
+Previous Sprints as separate field.
+So, for getting all issues, we call ProjectBacklog, that contains issues, 
+and sprint (not archived) which contains issues.

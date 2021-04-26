@@ -1,0 +1,29 @@
+# Common
+
+## For What
+
+Simplify many issues, with SBRF politics.
+
+### BAD: Create release
+
+- Make Issue with special type
+- Link issues of release with special link type (partOf)
+- Link only bug/story
+- Bug has hard workflow, that commonly fast-forwarded
+- Special fields, that can be setted automatically
+
+### BAD: Jira dashboard
+
+- can't view grouped by user
+- when many projects and people works, jira hangs
+
+# Highlights
+
+- fast works, because simple and for 1 project
+- proxy over jira
+- simplify burocraty
+
+## Simplified features
+
+- autofill fields (scripted?)
+- override workflow with special script or fast-forward methods

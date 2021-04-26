@@ -1,10 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Types where
+module Types
+( AppM
+, AppEnv(..)
+, DbConfig(..)
+)
+where
 
 import           Control.Monad.Reader (ReaderT)
 import           Data.Text            (Text)
 import           Servant
+
 type AppM = ReaderT AppEnv Handler
 
 data DbConfig =
@@ -14,5 +20,7 @@ data DbConfig =
            deriving (Show)
 
 data AppEnv =
-  AppEnv { dbConfig :: DbConfig
-         , logPath  :: String }
+  AppEnv { dbConfig      :: DbConfig
+         , logPath       :: String
+         , configEnvPort :: Int
+         }

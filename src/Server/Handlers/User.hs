@@ -2,22 +2,23 @@
 
 module Server.Handlers.User where
 import Servant
-import Domain.Models (User)
+import Domain.Models (User, Key)
 import Storage
 import Types 
 import Common 
+import Domain.InputBounds.CreateUser 
 
-type UsersAPI = "users" :> ( ReqBody '[JSON] User :> Post '[JSON] ()
+type UsersAPI = "users" :> ( ReqBody '[JSON] CreateUserSchema  :> Post '[JSON] (Key User)
                     :<|> Get '[JSON] [User]
                     )
 
 usersHandler :: AppM [User]
 usersHandler = do
---   ctx <- ask
   runDb Storage.allUsers
   
-addUserHandler :: User -> AppM ()
-addUserHandler = runDb . Storage.insertUser
+addUserHandler :: CreateUserSchema -> AppM (Key User)
+-- TODO: return user key
+addUserHandler u = runDb $ Storage.insertUser u
 
 
 usersServer = addUserHandler :<|> usersHandler

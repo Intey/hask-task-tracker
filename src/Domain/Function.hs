@@ -2,12 +2,14 @@
 
 module Domain.Function where
 
-import Control.Monad.State
-import Data.Char (toUpper)
-import Data.Default
-import qualified Domain.InputBounds as IB
-import Domain.Interfaces as DI
-import Domain.Models
+import           Control.Monad.State
+import           Data.Char                        (toUpper)
+import           Data.Default
+import           Domain.Interfaces                as DI
+import           Domain.Models
+
+import qualified Domain.InputBounds.CreateIssue   as IB
+import qualified Domain.InputBounds.CreateProject as IB
 
 createIssue ::
   (Monad m, IssuesStorage m) =>
@@ -31,7 +33,7 @@ createProject ::
 createProject owner name descr = do
   DI.createProject $
     def
-      { projectKey = Key $ map toUpper name ++ "-",
+      { projectKey = Key $ map toUpper name,
         projectName = name,
         projectDescription = descr,
         projectOwner = owner
@@ -48,5 +50,7 @@ getBacklogScreen pk = do
     Just n -> do
       ivc <- loadIssueViewConfig pk -- TODO: typeclass to load backlog config?
       sprints <- loadSprints pk
-      pure . Just $ BackLogScreen n issues sprints ivc
-    Nothing -> do pure Nothing
+      case ivc of
+        Just i  -> pure . Just $ BackLogScreen n issues sprints i
+        Nothing -> pure Nothing
+    Nothing -> pure Nothing

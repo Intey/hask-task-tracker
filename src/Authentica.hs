@@ -7,7 +7,7 @@ import           Control.Monad.Reader
 import           Data.Aeson
 import           Data.Bson.Generic
 import qualified Data.ByteString.Char8 as BS
-import           Database.MongoDB      as Mongo
+import qualified Database.MongoDB      as Mongo
 import           GHC.Generics          (Generic)
 import           Domain.Models
 import           Servant
@@ -20,8 +20,10 @@ data AuthUser = AUser { id     :: String
 } deriving (Show, Generic)
 
 authUserFromUser :: Maybe User -> Maybe AuthUser
-authUserFromUser (Just (User username _ _)) = Just $ AUser username ""
 authUserFromUser Nothing = Nothing 
+authUserFromUser u = do
+  (Key uname) <- fmap username u
+  return $ AUser uname ""
 
 instance ToJSON AuthUser
 instance FromJSON AuthUser
@@ -30,7 +32,7 @@ instance FromJWT AuthUser
 
 instance FromBSON AuthUser
 
-checkAuth ::  BasicAuthData -> Action IO (AuthResult AuthUser)
+checkAuth ::  BasicAuthData -> Mongo.Action IO (AuthResult AuthUser)
 checkAuth (BasicAuthData login password) = do
     maybe SAS.Indefinite 
         Authenticated . authUserFromUser 

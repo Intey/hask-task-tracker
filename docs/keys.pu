@@ -1,0 +1,10 @@
+@startuml
+actor User
+User -> TT: create issue
+activate TT
+TT -> Mongo: save
+TT -> User: done, issue (key local)
+TT -> JiraAPI: make issue
+JiraAPI -> TT: issue ID
+TT -> Mongo: update key field
+@enduml

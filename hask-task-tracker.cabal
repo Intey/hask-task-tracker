@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 106cdd806f158a2dc862b53c2c626a008cea1a11586f6978ce7bbf9a93d53e36
+-- hash: 577bb08ec548b2fddc422b23b7451759bdc66c9ae358b57c916a6d7533b0f7d4
 
 name:           hask-task-tracker
 version:        0.1.0.0
@@ -29,7 +29,10 @@ library
       Authentica
       Common
       Domain.Function
-      Domain.InputBounds
+      Domain.InputBounds.CreateBacklogConfig
+      Domain.InputBounds.CreateIssue
+      Domain.InputBounds.CreateProject
+      Domain.InputBounds.CreateUser
       Domain.Interfaces
       Domain.Models
       Permission
@@ -42,6 +45,7 @@ library
       Server.Types
       Storage
       Types
+      Utils
   other-modules:
       Paths_hask_task_tracker
   hs-source-dirs:
@@ -56,6 +60,7 @@ library
     , data-default
     , fast-logger
     , hslogger
+    , lens
     , monad-logger
     , mongoDB
     , mtl
@@ -91,6 +96,7 @@ executable hask-task-tracker-exe
     , fast-logger
     , hask-task-tracker
     , hslogger
+    , lens
     , monad-logger
     , mongoDB
     , mtl
@@ -128,6 +134,7 @@ test-suite hask-task-tracker-test
     , fast-logger
     , hask-task-tracker
     , hslogger
+    , lens
     , monad-logger
     , mongoDB
     , mtl
