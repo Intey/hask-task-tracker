@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Common where
 
@@ -8,13 +8,11 @@ import           Control.Monad.Reader
 import           Control.Monad.Trans
 import           Data.Aeson
 import           Database.MongoDB
-
 import           Control.Exception.Base
 import           Types
 
 databasename :: Database
 databasename = "tracker"
-
 
 runDb :: Action IO a -> AppM a
 runDb action = do
@@ -33,18 +31,19 @@ runDb_ action config = do
   close pipe
 
 instance FromJSON DbConfig where
-  parseJSON = withObject "dbConf" $ \o -> do
-    dbHostname <- o .: "host"
-    dbName     <- o .: "database"
-    return DbConfig{..}
-
+  parseJSON = withObject "dbConf"
+    $ \o -> do
+      dbHostname <- o .: "host"
+      dbName <- o .: "database"
+      return DbConfig { .. }
 
 instance FromJSON AppEnv where
-  parseJSON = withObject "config" $ \o -> do
-    logPath    <- o      .: "logPath"
-    configEnvPort <- o   .: "port"
-    dbConf     <- o      .: "dbConfig"
-    dbHostname <- dbConf .: "host"
-    dbName     <- dbConf .: "database"
-    let dbConfig = DbConfig {..}
-    return (AppEnv dbConfig logPath configEnvPort)
+  parseJSON = withObject "config"
+    $ \o -> do
+      logPath <- o .: "logPath"
+      configEnvPort <- o .: "port"
+      dbConf <- o .: "dbConfig"
+      dbHostname <- dbConf .: "host"
+      dbName <- dbConf .: "database"
+      let dbConfig = DbConfig { .. }
+      return (AppEnv dbConfig logPath configEnvPort)

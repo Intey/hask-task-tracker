@@ -1,9 +1,8 @@
 module Domain.Interfaces where
 
 import           Domain.InputBounds.CreateIssue (CreateIssueSchema)
-import           Domain.Models                  (Issue, IssueViewConfig, Key,
-                                                 Sprint)
-import           Domain.Models.Project          (Project)
+import           Domain.Models (Issue, IssueViewConfig, Key, Sprint)
+import           Domain.Models.Project (Project)
 
 class ProjectStorage m where
   loadProject :: Key Project -> m (Maybe Project)
