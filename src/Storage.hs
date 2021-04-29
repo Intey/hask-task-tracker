@@ -24,9 +24,9 @@ import           Database.MongoDB.Admin        (Index (Index))
 import           Debug.Trace
 import           Domain.InputBounds.CreateUser
 import qualified Domain.Interfaces             as DI
-import           Domain.Models                 (Issue, Key (Key),
-                                                Project (Project), User (User),
+import           Domain.Models                 (Issue, Key (Key), User (User),
                                                 Workflow)
+import Domain.Models.Project as Prj
 import qualified Domain.Models                 as DM
 import Data.Char (toUpper)
 
@@ -107,7 +107,7 @@ createProject p = do
 
 loadProject :: Key Project -> Action IO (Maybe Project)
 loadProject k = do
-    doc <- findOne (select ["projectKey" =: k] projectsCollection)
+    doc <- findOne (select ["key" =: k] projectsCollection)
     return (doc >>= fromBSON)
 
 
@@ -166,7 +166,7 @@ parseProjectIssues :: Maybe Document -> Maybe [Issue]
 parseProjectIssues doc = do
     d <- doc
     prj <- fromBSON d
-    pure $ DM.projectIssues prj
+    pure $ Prj.issues prj
 
 
 filterNothing :: [Maybe a] -> [a]

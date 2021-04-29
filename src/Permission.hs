@@ -3,7 +3,7 @@ module Permission where
 data Permission action = Granted action | Forbidden deriving (Show, Eq)
 
 instance Functor Permission where
-    fmap f Forbidden = Forbidden
+    fmap _ Forbidden = Forbidden
     fmap f (Granted a) = Granted $ f a
 
 instance Applicative Permission where
