@@ -8,8 +8,10 @@ module Domain.InputBounds.CreateIssue where
 import           Data.Aeson (FromJSON, ToJSON, parseJSON, withObject, (.:)
                            , (.:?))
 import           Data.Swagger (ToSchema)
-import           Domain.Models (Issue, Key, User)
+import           Domain.Models (Key, User)
 import           GHC.Generics (Generic)
+import           Domain.Models.Issue
+import           Domain.Models.Project
 
 data CreateIssueSchema =
   CI { summary :: String
@@ -17,5 +19,6 @@ data CreateIssueSchema =
      , assignee :: Maybe (Key User)
      , reporter :: Key User
      , linkedIssues :: [Key Issue]
+     , project :: Key Project
      }
   deriving (Show, Generic, ToSchema, FromJSON)

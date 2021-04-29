@@ -11,7 +11,7 @@ import           Domain.Models
 instance DI.IssuesStorage AppM where
   loadIssues k = runDb $ Storage.projectIssues k
 
-  saveIssue = undefined
+  saveIssue = runDb $ _
 
 instance DI.ProjectStorage AppM where
   loadProject = runDb . Storage.loadProject

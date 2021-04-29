@@ -19,10 +19,14 @@ import           Database.MongoDB.Admin (Index(Index))
 import           Debug.Trace
 import           Domain.InputBounds.CreateUser
 import qualified Domain.Interfaces as DI
-import           Domain.Models (Issue, Key(Key), User(User), Workflow)
+import           Domain.Models (Key(Key), User(User))
 import           Domain.Models.Project as Prj
 import qualified Domain.Models as DM
 import           Data.Char (toUpper)
+import           Domain.Models.Issue
+import           Domain.Models.BacklogScreen
+import           Domain.Models.Workflow
+import           Domain.InputBounds.CreateIssue
 
 projectsCollection :: Collection
 projectsCollection = "projects"
@@ -69,13 +73,13 @@ instance ToBSON (Key Project)
 
 instance FromBSON (Key Project)
 
-instance FromBSON DM.IssueField
+instance FromBSON IssueField
 
-instance ToBSON DM.IssueField
+instance ToBSON IssueField
 
-instance FromBSON DM.IssueViewConfig
+instance FromBSON IssueViewConfig
 
-instance ToBSON DM.IssueViewConfig
+instance ToBSON IssueViewConfig
 
 instance ToBSON Project
 
@@ -99,9 +103,8 @@ instance ToBSON Workflow
 instance FromBSON Workflow
 
 {-| saveProject updates exist project -}
-saveProject :: Project -> Action IO ()
-saveProject = insert_ projectsCollection . toBSON
-
+-- saveProject :: Project -> Action IO ()
+-- saveProject = insert_ projectsCollection . toBSON
 createProject :: Project -> Action IO (Key Project)
 createProject p = do
   insert projectsCollection (toBSON p) <&> Key . show
@@ -111,34 +114,43 @@ loadProject k = do
   doc <- findOne (select ["key" =: k] projectsCollection)
   return (doc >>= fromBSON)
 
-projectIssues :: Key Project -> Action IO [Issue]
-projectIssues (Key k) = do
-  proj <- findOne (select ["key" =: k] projectsCollection)
-  case parseProjectIssues proj of
-    Just is -> pure is
-    Nothing -> pure []
+createIssue :: CreateIssueSchema -> Action IO (Key Issue)
+createIssue (CI s d a r ls p) = do
+  result <- findAndModify
+    (select ["key" =: p] projectsCollection)
+    ["issues.$addToSet" =: Issue (Key $ map toUpper s) s d a r ls]
+  case result of
+    Left e  -> return (Key e)
+    Right d -> return $ Key (look "key" d >>= cast)
 
+-- projectIssues :: Key Project -> Action IO [Issue]
+-- projectIssues (Key k) = do
+--   proj <- findOne (select ["key" =: k] projectsCollection)
+--   case parseProjectIssues proj of
+--     Just is -> pure is
+--     Nothing -> pure []
 loadProjectName :: Key Project -> Action IO (Maybe String)
 loadProjectName (Key k) = do
   proj <- findOne
-    (select
-       ["key" =: k]
-       projectsCollection) { project = ["name" =: 1, "_id" =: 0] }
+    (select ["key" =: k] projectsCollection) { Database.MongoDB.project =
+                                                 ["name" =: 1, "_id" =: 0]
+                                             }
   return $ proj >>= look "name" >>= cast
 
-loadIssueViewConfig :: Key Project -> Action IO (Maybe DM.IssueViewConfig)
+loadIssueViewConfig :: Key Project -> Action IO (Maybe IssueViewConfig)
 loadIssueViewConfig (Key k) = do
   proj <- findOne
-    (select ["key" =: k] projectsCollection) { project = ["viewConfig" =: 1] }
+    (select
+       ["key" =: k]
+       projectsCollection) { Database.MongoDB.project = ["viewConfig" =: 1] }
   return $ proj >>= look "viewConfig" >>= cast
 
-saveBacklogConfig
-  :: Key Project -> DM.IssueViewConfig -> DM.Workflow -> Action IO Bool
-saveBacklogConfig (Key k) ivc w = findAndModify
-  (select ["key" =: k] projectsCollection)
-  ["viewConfig" =: ivc, "workflow" =: w]
-  <&> either (const False) (const True)
-
+-- saveBacklogConfig
+--   :: Key Project -> IssueViewConfig -> Workflow -> Action IO Bool
+-- saveBacklogConfig (Key k) ivc w = findAndModify
+--   (select ["key" =: k] projectsCollection)
+--   ["viewConfig" =: ivc, "workflow" =: w]
+--   <&> either (const False) (const True)
 toIssue :: Action IO [Document] -> Action IO [Issue]
 toIssue = fmap (filterNothing . map fromBSON)
 

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f38a4e6e344aae5eba0146779ba01e8e8e318c4adcab4c15dbffebccf5d40839
+-- hash: e23a65648b16ba6bef097b1fdaa065d9b86563d31393fcbd10813b579d7d8869
 
 name:           hask-task-tracker
 version:        0.1.0.0
@@ -36,14 +36,20 @@ library
       Domain.Interfaces
       Domain.Models
       Domain.Models.Backlog
+      Domain.Models.BacklogScreen
+      Domain.Models.Issue
       Domain.Models.Project
+      Domain.Models.Sprint
+      Domain.Models.Workflow
       Permission
       Server.Api
       Server.App
       Server.Handlers
       Server.Handlers.Auth
+      Server.Handlers.Issues
       Server.Handlers.Project
       Server.Handlers.User
+      Server.Instances
       Server.Types
       Storage
       Types

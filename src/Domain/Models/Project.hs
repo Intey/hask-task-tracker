@@ -9,6 +9,7 @@ import           Data.Default (Default(..))
 import           Data.Swagger (ToSchema)
 import           Domain.Models
 import           GHC.Generics (Generic)
+import           Domain.Models.Issue
 
 data Project = Project { key :: Key Project
                        , name :: String

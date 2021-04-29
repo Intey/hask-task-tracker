@@ -10,17 +10,20 @@ import qualified Domain.InputBounds.CreateProject as IB
 import           Domain.Interfaces as DI
 import           Domain.Models
 import qualified Domain.Models.Project as P
+import           Domain.Models.Issue
+import           Domain.Models.BacklogScreen
 
 createIssue :: (Monad m, IssuesStorage m)
             => Key User
             -> Key P.Project
             -> String
             -> Maybe String
+            -> [Key Issue]
             -> m Issue
-createIssue r p s d = do
-  let inputIssue = IB.CI s d Nothing r []
+createIssue r p s d links = do
+  let inputIssue = IB.CI s d Nothing r [] p
   key <- saveIssue inputIssue
-  return $ Issue key s d Nothing r []
+  return $ Issue key s d Nothing r links
 
 -- | createProject gets owner, name and descritpion, and creates new project
 createProject

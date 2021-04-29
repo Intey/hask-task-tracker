@@ -10,6 +10,8 @@ import           Data.Aeson (FromJSON, ToJSON, parseJSON, withObject, (.:)
 import           Data.Swagger
 import           GHC.Generics (Generic)
 import           Domain.Models
+import           Domain.Models.BacklogScreen
+import           Domain.Models.Workflow
 
 data CreateBacklogConfig =
   CBC { configIssueViewConfig :: IssueViewConfig, configWorkflow :: Workflow }

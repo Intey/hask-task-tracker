@@ -1,14 +1,15 @@
 
 ## Last Action
-
-- [ ] Make MongoDB doc id as Entity ID
-
-- [ ] Non default Serialize/Deserialize JSON
-- [ ] Non default Serialize/Deserialize Schema
 - [x] generate openapi schema
-- [ ] show project list
 - [x] show project by key (shows nothing)
-- [ ] Non default Serialize/Deserialize BSON. Return
+- [x] add nice formatting
+- [x] add showing docs by hover (work for my code and GHC.Base)
+- [x] make serialization for project as simple as possible
+- [ ] Make MongoDB doc id as Entity ID
+- [ ] make identifier (key) from string: replace spaces with underscores and etc.
+- [ ] decide how to pass schema to storage
+
+
 ## Boilerplate
 
 - [ ] auto generation fromSchema/toSchema from fromJSON/toJSON. 

@@ -17,14 +17,14 @@ import qualified Domain.Function as DF
 import           Domain.InputBounds.CreateBacklogConfig
 import           Domain.InputBounds.CreateProject
 import qualified Domain.Interfaces as DI
-import           Domain.Models (BackLogConfig, BackLogScreen, Issue, Key(Key)
-                              , User)
+import           Domain.Models (Key(Key), User)
 import           Domain.Models.Project (Project)
 import           GHC.Generics (Generic)
 import           Servant
 import           Server.Types
 import qualified Storage
 import           Types (AppM)
+import           Domain.Models.BacklogScreen
 
 type ProjectKey = String
 
