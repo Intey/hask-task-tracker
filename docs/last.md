@@ -8,8 +8,7 @@
 - [x] generate openapi schema
 - [ ] show project list
 - [x] show project by key (shows nothing)
-- [ ] Non default Serialize/Deserialize BSON. Return default
-
+- [ ] Non default Serialize/Deserialize BSON. Return
 ## Boilerplate
 
 - [ ] auto generation fromSchema/toSchema from fromJSON/toJSON. 

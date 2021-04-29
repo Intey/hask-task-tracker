@@ -35,15 +35,6 @@ data IssueField
   | Description
   deriving (Show, Eq, Generic, FromJSON, ToJSON, ToSchema)
 
-data Project = Project
-  { projectKey         :: Key Project,
-    projectName        :: String,
-    projectDescription :: String,
-    projectOwner       :: Key User,
-    projectIssues      :: [Issue]
-  }
-  deriving (Show, Eq, Generic, FromJSON, ToJSON, ToSchema)
-
 data Workflow = Workflow
   deriving (Show, Eq, Generic, FromJSON, ToJSON, ToSchema)
 
@@ -53,13 +44,6 @@ data Sprint = Sprint
   , sprintIssues :: [Issue]
   }
   deriving (Show, Eq, Generic, FromJSON, ToJSON, ToSchema)
-
-data BackLog = BackLog
-  { backlogProject :: Key Project
-  , backlogIssues  :: [Issue]
-  , backlogSprints :: [Sprint]
-  }
-  deriving (Show, Generic, FromJSON, ToJSON, ToSchema)
 
 data BackLogScreen = BackLogScreen
   { backlogScreenProject   :: String,
