@@ -8,7 +8,7 @@ module Storage where
 import           Control.Monad (liftM)
 import           Control.Monad.Trans (liftIO)
 import           Prelude hiding (lookup)
-import           Control.Monad.Trans.Either
+import           Control.Monad.Except
 import           Data.Bson
 import           Data.Bson.Generic
 import           Data.Char (toUpper)
@@ -118,7 +118,7 @@ loadProject k = do
 
 createIssue :: Key Project
             -> Issue
-            -> EitherT String Action IO (Either String (Key Issue))
+            -> ExceptT String Action IO (Either String (Key Issue))
 createIssue p (Issue k s d a r ls) = do
   result <- findAndModify
     (select ["key" =: p] projectsCollection)

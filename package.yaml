@@ -45,7 +45,7 @@ dependencies:
 - swagger2
 - lens
 - uuid
-- either # for EitherT
+- transformers # for EitherT
   # - template-haskell
   # - persistent
   # - persistent-mongoDB
