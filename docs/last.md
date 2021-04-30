@@ -7,7 +7,9 @@
 - [x] make serialization for project as simple as possible
 - [ ] Make MongoDB doc id as Entity ID
 - [ ] make identifier (key) from string: replace spaces with underscores and etc.
-- [ ] decide how to pass schema to storage
+- [x] decide how to pass schema to storage
+Schema ends in functions. After this we pass correct issue to store. Key should be craeted
+- [ ] transform DB Action to Either monad for error passing
 
 
 ## Boilerplate

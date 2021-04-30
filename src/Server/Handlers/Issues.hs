@@ -11,13 +11,14 @@ import           Types
 import qualified Domain.Function as DF
 import           Domain.Models.Issue
 import           Server.Types
+import Domain.Models.Project
 
 type IssuesAPI = "issues"
-  :> ((ReqBody '[JSON] CreateIssueSchema :> Post '[JSON] (Key Issue)))
+  :> (ReqBody '[JSON] CreateIssueSchema :> Post '[JSON] (Key Issue))
 
-postIssue :: CreateIssueSchema -> AppM (Key Issue)
-postIssue (CI sumr descr assignee reporter links prj) =
+postIssue :: Key Project -> CreateIssueSchema -> AppM (Key Issue)
+postIssue prj (CI sumr descr assignee reporter link) =
   issueKey <$> DF.createIssue reporter prj sumr descr links
 
-issuesServer :: ServerT IssuesAPI AppM
+issuesServer :: Key Project -> ServerT IssuesAPI AppM
 issuesServer = postIssue

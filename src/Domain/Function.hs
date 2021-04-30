@@ -19,11 +19,10 @@ createIssue :: (Monad m, IssuesStorage m)
             -> String
             -> Maybe String
             -> [Key Issue]
-            -> m Issue
+            -> m (Key Issue)
 createIssue r p s d links = do
-  let inputIssue = IB.CI s d Nothing r [] p
-  key <- saveIssue inputIssue
-  return $ Issue key s d Nothing r links
+  let inputIssue = Issue (Key "") s d Nothing r links
+  DI.saveIssue inputIssue
 
 -- | createProject gets owner, name and descritpion, and creates new project
 createProject

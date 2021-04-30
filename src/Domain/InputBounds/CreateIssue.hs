@@ -19,6 +19,5 @@ data CreateIssueSchema =
      , assignee :: Maybe (Key User)
      , reporter :: Key User
      , linkedIssues :: [Key Issue]
-     , project :: Key Project
      }
   deriving (Show, Generic, ToSchema, FromJSON)

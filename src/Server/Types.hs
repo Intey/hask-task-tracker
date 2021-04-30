@@ -9,9 +9,8 @@ import           Types
 import           Domain.Models
 
 instance DI.IssuesStorage AppM where
-  loadIssues k = runDb $ Storage.projectIssues k
-
-  saveIssue = runDb $ _
+  loadIssues = runDb . Storage.projectIssues
+  saveIssue = runDb . Storage.createIssue
 
 instance DI.ProjectStorage AppM where
   loadProject = runDb . Storage.loadProject

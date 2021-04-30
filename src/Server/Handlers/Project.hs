@@ -25,6 +25,7 @@ import           Server.Types
 import qualified Storage
 import           Types (AppM)
 import           Domain.Models.BacklogScreen
+import Server.Handlers.Issues
 
 type ProjectKey = String
 
@@ -35,7 +36,10 @@ type ProjectAPI = "projects"
                 :> (Get '[JSON] BackLogScreen :<|> "config"
                     :> (Get '[JSON] BackLogConfig
                         :<|> (ReqBody '[JSON] CreateBacklogConfig
-                              :> Post '[JSON] ()))))))
+                              :> Post '[JSON] ()))))
+            :<|> IssuesAPI
+            )
+      )
 
 postProject :: CreateProjectSchema -> AppM (Key Project)
 postProject (CreateProject o n d) =
@@ -71,3 +75,4 @@ projectServer = postProject
   :<|> getBacklogScreen projectKey
   :<|> getBacklogConfig projectKey
   :<|> postBacklogConfig projectKey
+  :<|> issuesServer projectKey

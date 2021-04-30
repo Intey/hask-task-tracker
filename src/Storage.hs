@@ -5,11 +5,13 @@
 
 module Storage where
 
-import           Prelude hiding (lookup)
 import           Control.Monad (liftM)
 import           Control.Monad.Trans (liftIO)
+import           Prelude hiding (lookup)
+import           Control.Monad.Trans.Either
 import           Data.Bson
 import           Data.Bson.Generic
+import           Data.Char (toUpper)
 import           Data.Functor ((<&>))
 import           Database.MongoDB (Action, Collection, Document, Query(project)
                                  , Select(select), cast, ensureIndex, find
@@ -17,16 +19,15 @@ import           Database.MongoDB (Action, Collection, Document, Query(project)
                                  , rest, typed, (=:))
 import           Database.MongoDB.Admin (Index(Index))
 import           Debug.Trace
+import           Domain.InputBounds.CreateIssue
 import           Domain.InputBounds.CreateUser
 import qualified Domain.Interfaces as DI
 import           Domain.Models (Key(Key), User(User))
-import           Domain.Models.Project as Prj
 import qualified Domain.Models as DM
-import           Data.Char (toUpper)
-import           Domain.Models.Issue
 import           Domain.Models.BacklogScreen
+import           Domain.Models.Issue
+import           Domain.Models.Project as Prj
 import           Domain.Models.Workflow
-import           Domain.InputBounds.CreateIssue
 
 projectsCollection :: Collection
 projectsCollection = "projects"
@@ -92,7 +93,7 @@ instance ToBSON Project
 instance FromBSON Project
 
   -- where
-  -- fromBSON doc = do  
+  -- fromBSON doc = do
   --   key <- lookup "key" doc
   --   name <- lookup "name" doc
   --   descr <- lookup "description" doc
@@ -105,6 +106,7 @@ instance FromBSON Workflow
 {-| saveProject updates exist project -}
 -- saveProject :: Project -> Action IO ()
 -- saveProject = insert_ projectsCollection . toBSON
+-- TODO: createProject: save id from uuid created in functions
 createProject :: Project -> Action IO (Key Project)
 createProject p = do
   insert projectsCollection (toBSON p) <&> Key . show
@@ -114,21 +116,24 @@ loadProject k = do
   doc <- findOne (select ["key" =: k] projectsCollection)
   return (doc >>= fromBSON)
 
-createIssue :: CreateIssueSchema -> Action IO (Key Issue)
-createIssue (CI s d a r ls p) = do
+createIssue :: Key Project
+            -> Issue
+            -> EitherT String Action IO (Either String (Key Issue))
+createIssue p (Issue k s d a r ls) = do
   result <- findAndModify
     (select ["key" =: p] projectsCollection)
     ["issues.$addToSet" =: Issue (Key $ map toUpper s) s d a r ls]
   case result of
-    Left e  -> return (Key e)
-    Right d -> return $ Key (look "key" d >>= cast)
+    Left e  -> return $ Left e
+    Right d -> return $ Right k
 
--- projectIssues :: Key Project -> Action IO [Issue]
--- projectIssues (Key k) = do
---   proj <- findOne (select ["key" =: k] projectsCollection)
---   case parseProjectIssues proj of
---     Just is -> pure is
---     Nothing -> pure []
+projectIssues :: Key Project -> Action IO [Issue]
+projectIssues (Key k) = do
+  proj <- findOne (select ["key" =: k] projectsCollection)
+  case parseProjectIssues proj of
+    Just is -> pure is
+    Nothing -> pure []
+
 loadProjectName :: Key Project -> Action IO (Maybe String)
 loadProjectName (Key k) = do
   proj <- findOne

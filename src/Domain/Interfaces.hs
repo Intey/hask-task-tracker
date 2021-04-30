@@ -16,7 +16,7 @@ class ProjectStorage m where
 
 class IssuesStorage m where
   loadIssues :: Key Project -> m [Issue]
-  saveIssue :: CreateIssueSchema -> m (Key Issue)
+  saveIssue :: Issue -> m (Key Issue)
 
 class SprintStorage m where
   loadSprints :: Key Project -> m [Sprint]
